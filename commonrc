@@ -121,6 +121,9 @@ alias gip="curl -s http://ipinfo.io/ip | cut -d'%' -f1"
 # SSH-Agent (from scripts/)
 alias sagent='source sagent'
 
+# Solution for when a program dies before printing EOL, which screws up zsh
+alias reset-term='stty sane'
+
 #####################
 # Functions
 #####################
