@@ -235,3 +235,73 @@ lsjid() {
   echo $(sacct -X --format "jobid%50" | tail -n1 | xargs)
 }
 
+# Squeue aliases
+#
+# jobid, partition, name, user, state, num nodes, dependencies, node list
+sq() {
+  PAD_WIDTH=6
+  REST_WIDTH=42
+  MAX_WIDTH=$(stty size | awk '{print $2}')
+  REM_WIDTH=$((MAX_WIDTH - REST_WIDTH - PAD_WIDTH))
+  NAME_WIDTH=$(( REM_WIDTH > 10 ? REM_WIDTH : 10 ))
+  echo $(squeue --format "%.8i %.10P %.${NAME_WIDTH}j %.5u %.8T %.5D %.6E" -S "-D")
+}
+
+# Like sq, but only for my jobs
+sqm() {
+  PAD_WIDTH=6
+  REST_WIDTH=37
+  MAX_WIDTH=$(stty size | awk '{print $2}')
+  REM_WIDTH=$((MAX_WIDTH - REST_WIDTH - PAD_WIDTH))
+  NAME_WIDTH=$(( REM_WIDTH > 10 ? REM_WIDTH : 10 ))
+  squeue --me --format "%.8i %.10P %.${NAME_WIDTH}j %.8T %.5D %.6E" -S "-D"
+}
+
+# jobid, name, state, node list
+sqn() {
+  PAD_WIDTH=6
+  REST_WIDTH=24
+  MAX_WIDTH=$(stty size | awk '{print $2}')
+  REM_WIDTH=$((MAX_WIDTH - REST_WIDTH - PAD_WIDTH))
+  REM_WIDTH=$(( REM_WIDTH > 20 ? REM_WIDTH : 20 ))
+  NAME_WIDTH=$((REM_WIDTH / 2))
+  NODE_LIST_WIDTH=$((REM_WIDTH - NAME_WIDTH))
+
+  # Node list does not respect size constraints, so we check output width first, and if it exceeds
+  # maximum, get rid of non-essential columns (name)
+
+  out=$(squeue --me --format "%.8i %.10P %.${NAME_WIDTH}j %.8T %.${NODE_LIST_WIDTH}N" -S "-D")
+  out_width=$(printf '%s\n' "$out" | wc -L)
+
+  if (( out_width > MAX_width )); then
+    squeue --me --format "%.8i %.8P %.8T %N" -S "-D"
+  else
+    echo $out
+  fi
+}
+
+# Run command on multiple remote nodes
+sshrun() {
+  COMMAND=$1
+  NODES=$2
+
+  if [ -n "$ZSH_VERSION" ]; then
+    IFS=',' read -r -A NODE_ARRAY <<< "$NODES" || return 1
+  else
+    IFS=',' read -r -a NODE_ARRAY <<< "$NODES" || return 1
+  fi
+
+  for TARGET in "${NODE_ARRAY[@]}"; do
+    echo "Running $COMMAND on $TARGET"
+    ssh -t $TARGET $COMMAND
+  done
+}
+
+
+# Run command on multiple remote nodes
+sshrun_local() {
+  COMMAND=$HOME/.local/bin/$1
+  NODES=$2
+
+  sshrun $COMMAND $NODES
+}
