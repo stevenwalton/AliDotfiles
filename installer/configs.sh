@@ -50,6 +50,10 @@ link_lscolors() {
   link_to_home "LS Colors" "lscolors" ".lscolors"
 }
 
+link_git_config() {
+  link_to_home "Git config" "gitconfig" ".gitconfig"
+}
+
 # Custom scripts
 link_custom_scripts() {
   # Conda init

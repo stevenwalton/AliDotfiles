@@ -87,6 +87,7 @@ link_lscolors
 link_inputrc
 link_commonrc
 link_bashrc
+link_git_config
 
 link_custom_scripts
 
