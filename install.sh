@@ -54,6 +54,7 @@ ensure_gettext
 
 # Utilities
 ensure_coreutils
+ensure_gnu_sed
 ensure_watch            # watch command
 #ensure_make
 ensure_cmake

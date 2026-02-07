@@ -99,6 +99,12 @@ ensure_git_lfs() {
   check_and_install_dependency "git-lfs" "$LOCALDIR/bin/git-lfs" "install_git_lfs"
 }
 
+# gnu sed
+source installer/dependencies/gnu-sed.sh
+ensure_gnu_sed() {
+  check_and_install_dependency "sed" "$LOCALDIR/bin/sed" "install_gnu_sed"
+}
+
 # Htop
 source installer/dependencies/htop.sh
 ensure_htop() {
