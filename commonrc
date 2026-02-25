@@ -305,3 +305,50 @@ sshrun_local() {
 
   sshrun $COMMAND $NODES
 }
+
+# Run and capture
+ctr() {
+    if [ "$#" -eq 0 ]; then
+        echo "Usage: ctr <command> [args...]"
+        return 1
+    fi
+
+    local date_str time_str pid logfile cmd ts_start ts_end exit_code
+
+    date_str="$(date '+%Y-%m-%d')"
+    time_str="$(date '+%H-%M-%S')"
+    pid="$$"
+
+    mkdir -p "logs_ctr/${date_str}" || return 1
+    logfile="logs_ctr/${date_str}/${time_str}_${pid}.txt"
+
+    ts_start="$(date '+%Y-%m-%d %H:%M:%S %z')"
+    cmd="$(printf '%q ' "$@")"
+
+    {
+        printf '================================================================================\n'
+        printf 'Timestamp      : %s\n' "$ts_start"
+        printf 'User           : %s\n' "$USER"
+        printf 'Host           : %s\n' "$(hostname)"
+        printf 'PID            : %d\n' "$pid"
+        printf 'PPID           : %d\n' "$PPID"
+        printf 'PWD            : %s\n' "$PWD"
+        printf 'Shell          : %s\n' "$SHELL"
+        printf 'Command        : %s\n' "$cmd"
+        printf '--------------------------------------------------------------------------------\n'
+    } > "$logfile"
+
+    "$@" 2>&1 | tee -a "$logfile"
+    exit_code=${PIPESTATUS[0]}
+
+    ts_end="$(date '+%Y-%m-%d %H:%M:%S %z')"
+
+    {
+        printf '--------------------------------------------------------------------------------\n'
+        printf 'Exit Code      : %d\n' "$exit_code"
+        printf 'End Timestamp  : %s\n' "$ts_end"
+        printf '================================================================================\n'
+    } >> "$logfile"
+
+    return "$exit_code"
+}

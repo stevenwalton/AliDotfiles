@@ -113,6 +113,7 @@ nnoremap <silent> <Leader><Space> :let @/ = "/\b\B"<cr>
 """""""""""""""""""""""""""""""""""""""""""""""""
 :command -nargs=* Q q <args>
 :command -nargs=* Qall qall <args>
+:command -nargs=* W w <args>
 :command -nargs=* Tabnew tabnew <args>
 :command -nargs=* Tab tab <args>
 :command -nargs=* Tabm tabm <args>
